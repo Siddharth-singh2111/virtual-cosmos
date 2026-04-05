@@ -74,6 +74,7 @@ io.on('connection', (socket) => {
     username: username,
     x: Math.floor(Math.random() * 400) + 100,
     y: Math.floor(Math.random() * 400) + 100,
+    isGhost: false,
   };
 
   socket.emit('map_state', activeUsers);
@@ -85,8 +86,12 @@ io.on('connection', (socket) => {
 
     socket.broadcast.emit('user_moved', { id: socket.id, x: newPosition.x, y: newPosition.y });
 
+    // --- UPDATED: Proximity Math (Ignoring Ghosts) ---
     Object.values(activeUsers).forEach(otherUser => {
       if (otherUser.id === socket.id) return;
+      
+      // NEW: Skip proximity check if EITHER user is in Ghost Mode!
+      if (activeUsers[socket.id].isGhost || otherUser.isGhost) return; 
 
       const dist = getDistance(newPosition.x, newPosition.y, otherUser.x, otherUser.y);
       const roomId = [socket.id, otherUser.id].sort().join('_');
@@ -97,8 +102,6 @@ io.on('connection', (socket) => {
           const partnerSocket = io.sockets.sockets.get(otherUser.id);
           if (partnerSocket) partnerSocket.join(roomId);
           
-          // IMPORTANT: We now send the partner's Socket ID as well, 
-          // because we will use their Socket ID as their PeerJS ID!
           io.to(roomId).emit('chat_joined', { 
             roomId, 
             partnerName: otherUser.username,
