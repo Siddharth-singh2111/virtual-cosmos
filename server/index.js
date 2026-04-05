@@ -23,10 +23,10 @@ const peerServer = ExpressPeerServer(server, {
 app.use('/peerjs', peerServer);
 
 const io = new Server(server, {
-  cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] }
+ cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const PROXIMITY_RADIUS = 150; 
 const activeUsers = {};
 
