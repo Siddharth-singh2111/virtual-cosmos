@@ -43,13 +43,13 @@ function App() {
     if (!username.trim()) return;
 
     try {
-      await fetch('http://localhost:3001/api/login', {
+      await fetch('https://virtual-cosmos-server.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username })
       });
 
-      const newSocket = io('http://localhost:3001', { query: { username } });
+      const newSocket = io('https://virtual-cosmos-server.onrender.com', { query: { username } });
       setSocket(newSocket);
       setIsLoggedIn(true);
 
@@ -136,8 +136,9 @@ function App() {
     socket.on('connect', () => {
       setIsConnected(true);
       const newPeer = new Peer(socket.id, {
-        host: 'localhost',
+        host: 'virtual-cosmos-server.onrender.com',
         port: 3001,
+        secure:true,
         path: '/peerjs'
       });
       setPeer(newPeer);
